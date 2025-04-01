@@ -2,7 +2,7 @@
 
 module system
 (
-  input wire CLK100MHZ,//GCLK
+  input wire CLK50MHZ,//GCLK
   /* input wire CLK32768KHZ,//RTC_CLK */
 
   input wire fpga_rst,//FPGA_RESET-T6
@@ -22,21 +22,23 @@ module system
   //gpioB
   // inout wire [31:0] gpioB,//GPIOB00~GPIOB31
 
+  //uart0
+  inout wire uart0_tx,
+  inout wire uart0_rx,
+
   // JD (used for JTAG connection)
   inout wire mcu_TDO,//MCU_TDO-N17
   inout wire mcu_TCK,//MCU_TCK-P15 
   inout wire mcu_TDI,//MCU_TDI-T18
   inout wire mcu_TMS,//MCU_TMS-P17
 
-  //pmu_wakeup
+  //pmu_wakeup(connected to LED)
   inout wire pmu_paden,  //PMU_VDDPADEN-U15
   inout wire pmu_padrst, //PMU_VADDPARST_V15
   inout wire mcu_wakeup  //MCU_WAKE-N15
 );
 
-  wire CLK32768KHZ; // RTC_CLK
 
-  wire clk_out1;
   wire mmcm_locked;
 
   wire reset_periph;
@@ -93,17 +95,18 @@ module system
 
   //=================================================
   // Clock & Reset
-  wire clk_8388;
   wire clk_16M;
-  
+  wire clk_32768HZ
 
 
   mmcm ip_mmcm
   (
     .resetn(ck_rst),
-    .clk_in1(CLK100MHZ),
+    .clk_in(CLK50MHZ),
     
-    .clk_out2(clk_16M), // 16 MHz, this clock we set to 16MHz 
+    .clk_out1(clk_16M),    // 16 MHz, this clock we set to core
+    .clk_out2(clk_32768HZ),// 32.768KHz, this clock we set to RTC
+
     .locked(mmcm_locked)
   );
 
@@ -135,20 +138,20 @@ module system
 
   // Instantiate pull-up resistors for the SPI data lines
   // Ensures the lines are pulled to a high logic level when not driven
-  PULLUP qspi0_pullup[3:0]
-  (
-    .O(qspi0_dq) // Connect to the bidirectional SPI data lines(qspi0_dq)
-  );
+  // PULLUP qspi0_pullup[3:0]
+  // (
+  //   .O(qspi0_dq) // Connect to the bidirectional SPI data lines(qspi0_dq)
+  // );
 
   // Instantiate IOBUFs for SPI data lines
   // IOBUFs allow bidirectional communication on the same physical pin
-  IOBUF qspi0_iobuf[3:0]
-  (
-    .IO(qspi0_dq),        // Bidirectional SPI Pins
-    .O(qspi0_ui_dq_i),    // Input data from FPGA SPI Pins to the e203
-    .I(qspi0_ui_dq_o),    // Output data from e203 to FPGA SPI Pins
-    .T(~qspi0_ui_dq_oe)   // High -> FPGA to e203, Low -> e203 to FPGA
-  );
+  // IOBUF qspi0_iobuf[3:0]
+  // (
+  //   .IO(qspi0_dq),        // Bidirectional SPI Pins
+  //   .O(qspi0_ui_dq_i),    // Input data from FPGA SPI Pins to the e203
+  //   .I(qspi0_ui_dq_o),    // Output data from e203 to FPGA SPI Pins
+  //   .T(~qspi0_ui_dq_oe)   // High -> FPGA to e203, Low -> e203 to FPGA
+  // );
 
 
   //=================================================
@@ -183,9 +186,9 @@ module system
     .I(dut_io_pads_gpioB_o_oval),
     .T(~dut_io_pads_gpioB_o_oe)
   );
+
   //=================================================
   // JTAG IOBUFs
-
   wire iobuf_jtag_TCK_o;
   IOBUF
   #(
@@ -280,7 +283,8 @@ module system
   /*
   //* bootrom_n_i_ival: 0 = bootrom(0x0000_1000), 1 = flash(0x2000_0000)
   */
-  assign dut_io_pads_bootrom_n_i_ival  = 1'b1;
+  assign dut_io_pads_bootrom_n_i_ival  = 1'b0;
+  // assign dut_io_pads_bootrom_n_i_ival  = 1'b1;
   assign dut_io_pads_dbgmode0_n_i_ival = 1'b1;
   assign dut_io_pads_dbgmode1_n_i_ival = 1'b1;
   assign dut_io_pads_dbgmode2_n_i_ival = 1'b1;
@@ -291,7 +295,7 @@ module system
     .hfextclk(clk_16M),
     .hfxoscen(),
 
-    .lfextclk(CLK32768KHZ), 
+    .lfextclk(clk_32768HZ), 
     .lfxoscen(),
 
     // Note: this is the real SoC top AON domain slow clock
@@ -357,11 +361,9 @@ module system
     .T(1'b1)
   );
   assign dut_io_pads_aon_pmu_dwakeup_n_i_ival = (~iobuf_dwakeup_o);
-
-  
-
   assign dut_io_pads_aon_pmu_vddpaden_i_ival = 1'b1;
 
+  /*
   assign qspi0_sck = dut_io_pads_qspi0_sck_o_oval;
   assign qspi0_cs  = dut_io_pads_qspi0_cs_0_o_oval;
   assign qspi0_ui_dq_o = {
@@ -380,6 +382,7 @@ module system
   assign dut_io_pads_qspi0_dq_1_i_ival = qspi0_ui_dq_i[1];
   assign dut_io_pads_qspi0_dq_2_i_ival = qspi0_ui_dq_i[2];
   assign dut_io_pads_qspi0_dq_3_i_ival = qspi0_ui_dq_i[3];
+  */
 
 
 
