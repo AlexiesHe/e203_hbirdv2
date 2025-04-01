@@ -96,7 +96,8 @@ module system
   //=================================================
   // Clock & Reset
   wire clk_16M;
-  wire clk_32768HZ
+  wire clk_8388608HZ;
+  wire clk_32768HZ;
 
 
   mmcm ip_mmcm
@@ -104,11 +105,18 @@ module system
     .resetn(ck_rst),
     .clk_in(CLK50MHZ),
     
-    .clk_out1(clk_16M),    // 16 MHz, this clock we set to core
-    .clk_out2(clk_32768HZ),// 32.768KHz, this clock we set to RTC
+    .clk_out1(clk_16M),       // 16 MHz, this clock we set to core
+    .clk_out2(clk_8388608HZ), // 32.768KHz, this clock we set to RTC
 
     .locked(mmcm_locked)
   );
+
+  clk_div u_clk_div(
+      .clk_in   ( clk_8388608HZ   ),
+      .rst_n    ( ~ck_rst         ),
+      .clk_out  ( clk_32768HZ     )
+  );
+
 
   assign ck_rst = fpga_rst & mcu_rst;
 
