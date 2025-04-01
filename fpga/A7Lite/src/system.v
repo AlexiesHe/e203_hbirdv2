@@ -151,7 +151,7 @@ module system
     .IOSTANDARD("DEFAULT"), // Use default I/O standard
     .SLEW("SLOW")           // Set slew rate to slow for better signal integrity
   )
-  iobuf_uart0_rx_o
+  iobuf_uart0_rx
   (
     .O(iobuf_uart0_rx_o),
     .IO(uart0_rx),                    // UART RX pin
@@ -167,7 +167,7 @@ module system
     .IOSTANDARD("DEFAULT"), // Use default I/O standard
     .SLEW("SLOW")           // Set slew rate to slow for better signal integrity
   )
-  iobuf_uart0_tx_o
+  iobuf_uart0_tx
   (
     .O(iobuf_uart0_tx_o),
     .IO(uart0_tx),                     // UART TX pin
