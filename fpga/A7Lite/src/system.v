@@ -128,9 +128,48 @@ module system
     .peripheral_aresetn()
   );
 
+
+  //=================================================
+  // UART0 Interface
+ //* io_pads_gpioA_o_oval[16] <-> io_pads_uart0_rxd_o_oval;
+ //* io_pads_gpioA_o_oval[17] <-> io_pads_uart0_txd_o_oval;
+  wire       iobuf_uart0_rx_o;
+  wire       iobuf_uart0_tx_o;
+
+  IOBUF
+  #(
+    .DRIVE(12),             // Output drive strength set to 12 mA
+    .IBUF_LOW_PWR("TRUE"),  // Enable low power mode for input buffer
+    .IOSTANDARD("DEFAULT"), // Use default I/O standard
+    .SLEW("SLOW")           // Set slew rate to slow for better signal integrity
+  )
+  iobuf_uart0_rx_o
+  (
+    .O(iobuf_uart0_rx_o),
+    .IO(uart0_rx),                    // UART RX pin
+    .I(dut_io_pads_gpioA_o_oval[16]), // No output from the FPGA
+    .T(~dut_io_pads_gpioA_o_oe[16])   // Always drive high (input mode)
+  );
+  assign dut_io_pads_gpioA_i_ival[16] = iobuf_uart0_rx_o;
+
+  IOBUF
+  #(
+    .DRIVE(12),             // Output drive strength set to 12 mA
+    .IBUF_LOW_PWR("TRUE"),  // Enable low power mode for input buffer
+    .IOSTANDARD("DEFAULT"), // Use default I/O standard
+    .SLEW("SLOW")           // Set slew rate to slow for better signal integrity
+  )
+  iobuf_uart0_tx_o
+  (
+    .O(iobuf_uart0_tx_o),
+    .IO(uart0_tx),                     // UART TX pin
+    .I(dut_io_pads_gpioA_o_oval[17]),  // Output from the FPGA
+    .T(~dut_io_pads_gpioA_o_oe[17])   // Drive low when output is enabled
+  );
+
+
   //=================================================
   // SPI0 Interface
-
   // Declare wires for SPI0 data signals
   wire [3:0] qspi0_ui_dq_o;  // Output data from the e203 to the FPGA SPI Pins
   wire [3:0] qspi0_ui_dq_oe; // Output enable signals for SPI data lines
@@ -156,7 +195,7 @@ module system
 
   //=================================================
   // IOBUF instantiation for GPIOs
-
+  /*
   IOBUF
   #(
     .DRIVE(12),             // Output drive strength set to 12 mA
@@ -186,6 +225,8 @@ module system
     .I(dut_io_pads_gpioB_o_oval),
     .T(~dut_io_pads_gpioB_o_oe)
   );
+  */
+
 
   //=================================================
   // JTAG IOBUFs
@@ -344,7 +385,6 @@ module system
   );
 
   // Assign reasonable values to otherwise unconnected inputs to chip top
-
   wire iobuf_dwakeup_o;
   IOBUF
   #(
@@ -361,7 +401,7 @@ module system
     .T(1'b1)
   );
   assign dut_io_pads_aon_pmu_dwakeup_n_i_ival = (~iobuf_dwakeup_o);
-  assign dut_io_pads_aon_pmu_vddpaden_i_ival = 1'b1;
+  assign dut_io_pads_aon_pmu_vddpaden_i_ival  = 1'b1;
 
   /*
   assign qspi0_sck = dut_io_pads_qspi0_sck_o_oval;
