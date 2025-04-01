@@ -82,7 +82,7 @@ module e203_soc_top(
   // dwakeup is input need to be pull-up by default
   input  io_pads_aon_pmu_dwakeup_n_i_ival,
 
-      // PMU output is just output without enable
+  // PMU output is just output without enable
   output io_pads_aon_pmu_padrst_o_oval,
   output io_pads_aon_pmu_vddpaden_o_oval 
 );

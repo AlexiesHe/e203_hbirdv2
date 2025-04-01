@@ -2,23 +2,25 @@
 
 module system
 (
-  input wire CLK100MHZ,//GCLK-W19
-  input wire CLK32768KHZ,//RTC_CLK-Y18
+  input wire CLK100MHZ,//GCLK
+  /* input wire CLK32768KHZ,//RTC_CLK */
 
   input wire fpga_rst,//FPGA_RESET-T6
   input wire mcu_rst,//MCU_RESET-P20
 
 
   // Dedicated QSPI interface
+  /*
   output wire qspi0_cs,
   output wire qspi0_sck,
   inout  wire [3:0] qspi0_dq,
+  */
                            
   //gpioA
-  inout wire [31:0] gpioA,//GPIOA00~GPIOA31
+  // inout wire [31:0] gpioA,//GPIOA00~GPIOA31
 
   //gpioB
-  inout wire [31:0] gpioB,//GPIOB00~GPIOB31
+  // inout wire [31:0] gpioB,//GPIOB00~GPIOB31
 
   // JD (used for JTAG connection)
   inout wire mcu_TDO,//MCU_TDO-N17
@@ -31,6 +33,8 @@ module system
   inout wire pmu_padrst, //PMU_VADDPARST_V15
   inout wire mcu_wakeup  //MCU_WAKE-N15
 );
+
+  wire CLK32768KHZ; // RTC_CLK
 
   wire clk_out1;
   wire mmcm_locked;
