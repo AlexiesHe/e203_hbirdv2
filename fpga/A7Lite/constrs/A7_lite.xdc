@@ -19,8 +19,8 @@ set_property PACKAGE_PIN L18 [get_ports fpga_rst   ]
 set_property PACKAGE_PIN  U2      [get_ports uart0_rx]
 set_property PACKAGE_PIN  V2      [get_ports uart0_tx]
 
-set_property IOSTANDARD   LVCMOS33 [get_ports UART_RX]
-set_property IOSTANDARD   LVCMOS33 [get_ports UART_TX]
+set_property IOSTANDARD   LVCMOS33 [get_ports uart0_rx]
+set_property IOSTANDARD   LVCMOS33 [get_ports uart0_tx]
 
 #####               MCU JTAG define           #####
 # GPIO2_0P
