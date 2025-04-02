@@ -179,12 +179,12 @@ module aic_rv32
   wire CLK32768KHZ;//RTC_CLK
   
 
-  PLL sys_clk_gen
+  mmcm sys_clk_gen
   (
     .resetn      (ck_rst    ),
-    .CLK_I_50M   (clk       ),
-    .CLK_O_16M   (clk_16M   ), // 16 MHz, this clock we set to 16MHz
-    .CLK_O_8M388 (clk_8388  ),
+    .clk_in      (clk       ),
+    .clk_out1    (clk_16M   ), // 16 MHz, this clock we set to 16MHz
+    .clk_out2    (clk_8388  ),
     .locked      (pll_locked)
   );
 
